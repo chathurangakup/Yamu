@@ -5,4 +5,5 @@ export const COLORS = {
   gradientBottom: "#FF9C2A",
   white: "#fff",
   social: "#535AFF",
+  inputBg: "#E7E7E7", // Common color for TextInput background
 };

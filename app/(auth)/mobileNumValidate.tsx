@@ -1,4 +1,5 @@
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import CommonButton from "../../components/CommonButton";
@@ -28,7 +29,10 @@ const MobileNumValidate = () => {
           By continuing you may recieve an SMS for verification. Message and
           data rates may apply.
         </Text>
-        <CommonButton title="Next" onPress={() => {}} />
+        <CommonButton
+          title="Next"
+          onPress={() => router.push("/(auth)/signUp")}
+        />
       </View>
     </View>
   );
