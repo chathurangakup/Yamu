@@ -6,4 +6,5 @@ export const COLORS = {
   white: "#fff",
   social: "#535AFF",
   inputBg: "#E7E7E7", // Common color for TextInput background
+  HOME_BG_COLOR: "#FFFAEF",
 };

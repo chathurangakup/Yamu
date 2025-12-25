@@ -1,12 +1,32 @@
 import CommonButton from "@/components/CommonButton";
 import CommonTextInput from "@/components/CommonTextInput";
 import { images } from "@/constants/images";
+import { useSignUpMutation } from "@/slices/auth/authApi";
+import { loginSuccess } from "@/slices/auth/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
+  const [signUp, { isLoading }] = useSignUpMutation();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignup = async () => {
+    try {
+      const result = await signUp({ email, password }).unwrap();
+      dispatch(loginSuccess(result.user));
+      //router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert("Signup Failed", "Please try again");
+    }
+  };
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
@@ -20,7 +40,6 @@ const SignUp = () => {
               right: 0,
               bottom: 0,
               top: 0,
-              borderRadius: 0,
             }}
             start={{ x: 0.5, y: 1 }}
             end={{ x: 0.5, y: 0 }}
@@ -29,6 +48,7 @@ const SignUp = () => {
             Create Your Account
           </Text>
         </View>
+
         {/* Form Section */}
         <View className="px-5 mt-8 space-y-4">
           <View className="pt-4">
@@ -36,16 +56,22 @@ const SignUp = () => {
             <CommonTextInput
               placeholder="Enter your name"
               autoCapitalize="words"
+              value={name}
+              onChangeText={setName}
             />
           </View>
+
           <View className="pt-4">
             <Text className="mb-2 text-base font-bold text-black">Email</Text>
             <CommonTextInput
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
+
           <View className="pt-4">
             <Text className="mb-2 text-base font-bold text-black">
               Password
@@ -54,19 +80,28 @@ const SignUp = () => {
               placeholder="Enter your password"
               secureTextEntry
               autoCapitalize="none"
+              value={password}
+              onChangeText={setPassword}
             />
           </View>
+
           {/* Button Section */}
           <View className="pt-6">
-            <CommonButton title="Sign Up" onPress={() => {}} />
+            <CommonButton
+              title={isLoading ? "Creating..." : "Sign Up"}
+              onPress={handleSignup}
+              disabled={!name || !email || password.length < 6 || isLoading}
+            />
           </View>
-          {/* Divider Section */}
+
+          {/* Divider */}
           <View className="flex-row items-center my-6">
             <View className="flex-1 h-px bg-[#E7E7E7]" />
             <Text className="mx-3 text-lg text-[#000] font-bold">Or</Text>
             <View className="flex-1 h-px bg-[#E7E7E7]" />
           </View>
-          {/* Google Login Button */}
+
+          {/* Google */}
           <View className="mb-8">
             <View className="flex-row items-center justify-center bg-white rounded-xl border border-[#000] px-4 py-3 mx-4">
               <Image
@@ -75,11 +110,12 @@ const SignUp = () => {
                 resizeMode="contain"
               />
               <Text className="text-base font-bold text-black">
-                Login with a Google
+                Login with google
               </Text>
             </View>
           </View>
-          {/* Already have an account? Log in */}
+
+          {/* Login */}
           <View className="items-center mb-8">
             <Text className="text-base text-black">
               Already have an account?{" "}

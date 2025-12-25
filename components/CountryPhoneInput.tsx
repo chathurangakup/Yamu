@@ -1,50 +1,67 @@
 import { AntDesign } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import CountrySelect, { ICountry } from "react-native-country-select";
 
-export default function CountryPhoneInput() {
+type Props = {
+  onChange?: (countryCode: string, phone: string) => void;
+};
+
+export default function CountryPhoneInput({ onChange }: Props) {
   const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [phone, setPhone] = useState("");
+
+  // ✅ Extract country calling code safely
+  const countryCode = selectedCountry?.idd?.root
+    ? `${selectedCountry.idd.root}`
+    : "";
+
+  // ✅ Notify parent whenever value changes
+  useEffect(() => {
+    if (onChange) {
+      onChange(countryCode, phone);
+    }
+  }, [countryCode, phone]);
+
   return (
     <View className="flex-row items-center rounded-xl p-2 shadow-sm">
+      {/* Country selector */}
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         className="flex-row items-center"
       >
-        {/* Flag on left side */}
-        {selectedCountry?.flag ? (
-          <Text className="text-2xl mr-2">{selectedCountry.flag}</Text>
-        ) : (
-          <Text className="text-2xl mr-2">🌐</Text>
-        )}
-        {/* Dropdown icon next to flag */}
+        <Text className="text-2xl mr-2">{selectedCountry?.flag ?? "🌐"}</Text>
+
         <AntDesign
           name="down"
           size={12}
           color="#333"
           style={{ marginRight: 8 }}
         />
-        {/* Country calling code (e.g. '+94') */}
-        <Text className="font-bold"></Text>
       </TouchableOpacity>
+
+      {/* Phone input */}
       <View className="flex-1 flex-row items-center ml-3 border-b border-gray-200">
-        <Text className="text-lg font-bold mr-1">
-          {selectedCountry?.idd?.root ? `${selectedCountry.idd.root}` : "+"}
-        </Text>
+        <Text className="text-lg font-bold mr-1">{countryCode || "+"}</Text>
+
         <TextInput
-          className="flex-1 text-lg"
+          className="flex-1 text-lg pb-3" // Added padding bottom
           placeholder="Phone number"
           keyboardType="phone-pad"
           value={phone}
           onChangeText={setPhone}
         />
       </View>
+
+      {/* Country modal */}
       <CountrySelect
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSelect={setSelectedCountry}
+        onSelect={(country) => {
+          setSelectedCountry(country);
+          setModalVisible(false);
+        }}
       />
     </View>
   );
